@@ -17,10 +17,12 @@ export default function wsHandler(wss) {
             break;
           case 'createGame':
             const newGame = await createGame(payload.name);
+
             response = { action: 'newGame', payload: newGame };
             break;
           case 'deleteGame':
             await deleteGame(payload.id);
+            
             response = { action: 'gameDeleted', payload: payload.id };
             break;
           case 'terminateGame':

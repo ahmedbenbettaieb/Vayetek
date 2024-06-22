@@ -29,9 +29,10 @@ ws.onmessage = (event) => {
   const { action, payload } = JSON.parse(event.data);
   if (action === 'updateGames') {
     updateGameLists(payload);
-
+    ws.send(JSON.stringify({ action: 'fetchGames' }));
   } else if (action === 'deleteGame') {
     removeGame(payload);
+    ws.send(JSON.stringify({ action: 'fetchGames' }));
 
   }
 };
@@ -44,27 +45,30 @@ function updateGameLists(games) {
 
   games.forEach(game => {
     const li = document.createElement('li');
+    li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-center');
     li.textContent = game.name;
-    li.dataset.id = game.id; // Ensure each list item has the game id for easy removal
+    li.dataset.id = game.id;
 
     if (game.status === 'active') {
+      const buttonGroup = document.createElement('div');
+      
       const terminateButton = document.createElement('button');
+      terminateButton.classList.add('btn', 'btn-warning', 'mr-2');
       terminateButton.textContent = 'Terminate';
       terminateButton.addEventListener('click', () => {
         ws.send(JSON.stringify({ action: 'terminateGame', payload: { id: game.id } }));
-            ws.send(JSON.stringify({ action: 'fetchGames' })); 
-
       });
 
       const deleteButton = document.createElement('button');
+      deleteButton.classList.add('btn', 'btn-danger');
       deleteButton.textContent = 'Delete';
       deleteButton.addEventListener('click', () => {
         ws.send(JSON.stringify({ action: 'deleteGame', payload: { id: game.id } }));
-
       });
 
-      li.appendChild(terminateButton);
-      li.appendChild(deleteButton);
+      buttonGroup.appendChild(terminateButton);
+      buttonGroup.appendChild(deleteButton);
+      li.appendChild(buttonGroup);
       activeGames.appendChild(li);
     } else {
       terminatedGames.appendChild(li);
@@ -78,4 +82,5 @@ function removeGame(gameId) {
     gameElement.remove();
 
   }
+
 }
