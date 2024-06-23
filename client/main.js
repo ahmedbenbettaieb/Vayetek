@@ -1,3 +1,4 @@
+
 const ws = new WebSocket('ws://localhost:3000');
 
 ws.onopen = () => {
@@ -18,10 +19,7 @@ document.getElementById('create-game').addEventListener('click', () => {
 
   }
 });
-//we will do the same but we with the delete button
-// document.getElementById('delete-game').addEventListener('click', () => {
-    
-// })
+
 
 
 
@@ -51,30 +49,35 @@ function updateGameLists(games) {
 
     if (game.status === 'active') {
       const buttonGroup = document.createElement('div');
-      
+
       const terminateButton = document.createElement('button');
       terminateButton.classList.add('btn', 'btn-warning', 'mr-2');
       terminateButton.textContent = 'Terminate';
-      terminateButton.addEventListener('click', () => {
-        ws.send(JSON.stringify({ action: 'terminateGame', payload: { id: game.id } }));
-      });
 
       const deleteButton = document.createElement('button');
       deleteButton.classList.add('btn', 'btn-danger');
       deleteButton.textContent = 'Delete';
-      deleteButton.addEventListener('click', () => {
-        ws.send(JSON.stringify({ action: 'deleteGame', payload: { id: game.id } }));
-      });
 
       buttonGroup.appendChild(terminateButton);
       buttonGroup.appendChild(deleteButton);
-      li.appendChild(buttonGroup);
+      li.appendChild(buttonGroup); // Append buttonGroup to li
       activeGames.appendChild(li);
+
+      // Attach event listeners to the terminate buttons
+      terminateButton.addEventListener('click', () => {
+        ws.send(JSON.stringify({ action: 'terminateGame', payload: { id: game.id } }));
+        ws.send(JSON.stringify({ action: 'fetchGames' }));
+      });
+
+      deleteButton.addEventListener('click', () => {
+        ws.send(JSON.stringify({ action: 'deleteGame', payload: { id: game.id } }));
+      });
     } else {
       terminatedGames.appendChild(li);
     }
   });
 }
+
 
 function removeGame(gameId) {
   const gameElement = document.querySelector(`li[data-id="${gameId}"]`);
