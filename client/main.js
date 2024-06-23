@@ -1,10 +1,8 @@
-
 const ws = new WebSocket('ws://localhost:3000');
 
 ws.onopen = () => {
   console.log('Connected to WebSocket server');
   ws.send(JSON.stringify({ action: 'fetchGames' })); 
-
 };
 
 ws.onerror = (error) => {
@@ -16,12 +14,8 @@ document.getElementById('create-game').addEventListener('click', () => {
   if (name) {
     ws.send(JSON.stringify({ action: 'createGame', payload: { name } }));
     ws.send(JSON.stringify({ action: 'fetchGames' })); 
-
   }
 });
-
-
-
 
 ws.onmessage = (event) => {
   const { action, payload } = JSON.parse(event.data);
@@ -31,15 +25,18 @@ ws.onmessage = (event) => {
   } else if (action === 'deleteGame') {
     removeGame(payload);
     ws.send(JSON.stringify({ action: 'fetchGames' }));
-
   }
 };
 
 function updateGameLists(games) {
   const activeGames = document.getElementById('active-games');
   const terminatedGames = document.getElementById('terminated-games');
+  const terminatedCount = document.getElementById('terminated-count');
+  
   activeGames.innerHTML = '';
   terminatedGames.innerHTML = '';
+
+  let terminatedGameCount = 0;
 
   games.forEach(game => {
     const li = document.createElement('li');
@@ -60,10 +57,9 @@ function updateGameLists(games) {
 
       buttonGroup.appendChild(terminateButton);
       buttonGroup.appendChild(deleteButton);
-      li.appendChild(buttonGroup); // Append buttonGroup to li
+      li.appendChild(buttonGroup);
       activeGames.appendChild(li);
 
-      // Attach event listeners to the terminate buttons
       terminateButton.addEventListener('click', () => {
         ws.send(JSON.stringify({ action: 'terminateGame', payload: { id: game.id } }));
         ws.send(JSON.stringify({ action: 'fetchGames' }));
@@ -74,16 +70,16 @@ function updateGameLists(games) {
       });
     } else {
       terminatedGames.appendChild(li);
+      terminatedGameCount++;
     }
   });
-}
 
+  terminatedCount.textContent = terminatedGameCount;
+}
 
 function removeGame(gameId) {
   const gameElement = document.querySelector(`li[data-id="${gameId}"]`);
   if (gameElement) {
     gameElement.remove();
-
   }
-
 }
