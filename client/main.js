@@ -2,7 +2,7 @@ const ws = new WebSocket('ws://localhost:3000');
 
 ws.onopen = () => {
   console.log('Connected to WebSocket server');
-  ws.send(JSON.stringify({ action: 'fetchGames' })); 
+  ws.send(JSON.stringify({ action: 'fetchGames' }));
 };
 
 ws.onerror = (error) => {
@@ -13,7 +13,7 @@ document.getElementById('create-game').addEventListener('click', () => {
   const name = document.getElementById('game-name').value;
   if (name) {
     ws.send(JSON.stringify({ action: 'createGame', payload: { name } }));
-    ws.send(JSON.stringify({ action: 'fetchGames' })); 
+    ws.send(JSON.stringify({ action: 'fetchGames' }));
   }
 });
 
@@ -31,12 +31,12 @@ ws.onmessage = (event) => {
 function updateGameLists(games) {
   const activeGames = document.getElementById('active-games');
   const terminatedGames = document.getElementById('terminated-games');
-  const terminatedCount = document.getElementById('terminated-count');
+  const activeCount = document.getElementById('active-count');
   
   activeGames.innerHTML = '';
   terminatedGames.innerHTML = '';
 
-  let terminatedGameCount = 0;
+  let activeGameCount = 0;
 
   games.forEach(game => {
     const li = document.createElement('li');
@@ -45,6 +45,8 @@ function updateGameLists(games) {
     li.dataset.id = game.id;
 
     if (game.status === 'active') {
+      activeGameCount++;
+
       const buttonGroup = document.createElement('div');
 
       const terminateButton = document.createElement('button');
@@ -70,11 +72,10 @@ function updateGameLists(games) {
       });
     } else {
       terminatedGames.appendChild(li);
-      terminatedGameCount++;
     }
   });
 
-  terminatedCount.textContent = terminatedGameCount;
+  activeCount.textContent = activeGameCount;
 }
 
 function removeGame(gameId) {
