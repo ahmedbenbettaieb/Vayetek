@@ -1,12 +1,18 @@
 import pkg from 'pg';
+import dotenv from 'dotenv';
+
 const { Pool } = pkg;
 
+// Load environment variables from .env file
+dotenv.config();
+
+// Create a new pool using environment variables
 const pool = new Pool({
-  user:'postgres', 
-  host:'localhost',
-  database:'games_management',
-  password:'29061998', 
-  port: 5433,
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
 });
 
 pool.connect()
@@ -16,8 +22,5 @@ pool.connect()
   .catch(err => {
     console.error('Error connecting to the database:', err.stack);
   });
-
-
-
 
 export default pool;
